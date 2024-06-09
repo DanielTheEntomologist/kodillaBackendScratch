@@ -1,0 +1,19 @@
+{
+  "name": "watermarker",
+  "version": "1.0.0",
+  "description": "adds watermarks to images",
+  "main": "app.js",
+  "scripts": {
+    "test": "npm run test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/DanielTheEntomologist/kodillaBackendScratch/commit/8222e1f4f1acecf153dd317ead9e755e6c31a570"
+  },
+  "keywords": [
+    "images",
+    "watermark"
+  ],
+  "author": "DanielTheEnthomologist",
+  "license": "MIT"
+}

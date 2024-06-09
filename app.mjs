@@ -1,5 +1,6 @@
 import inquirer from "inquirer";
 import Jimp from "jimp";
+import fs from "fs";
 
 // wait for 100 ms so that punycode depreciation warning for jimp is show abouve the inquirer prompt
 await new Promise((resolve) => setTimeout(resolve, 100)); // 100 ms delay
@@ -18,6 +19,13 @@ const askToStart = async function () {
   if (!answer.start) process.exit();
 };
 
+async function checkFileExists(file) {
+  return fs.promises
+    .access(file, fs.constants.F_OK)
+    .then(() => true)
+    .catch(() => "File cannot be accessed! Please enter a valid path.");
+}
+
 async function askForInputs() {
   const answers = await inquirer.prompt([
     // ask for the path to the input image file
@@ -26,6 +34,7 @@ async function askForInputs() {
       name: "imagePath",
       default: IMAGES_PATH + "example-image.jpg",
       message: "Enter the path to the image file:",
+      validate: checkFileExists,
     },
     // then ask for a type of watermark (text or image)
     {
@@ -49,6 +58,7 @@ async function askForInputs() {
       default: IMAGES_PATH + "example-watermark.png",
       message: "Enter the path to the watermark image:",
       when: (answers) => answers.watermarkType === "Image",
+      validate: checkFileExists,
     },
   ]);
 

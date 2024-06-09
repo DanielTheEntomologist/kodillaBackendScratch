@@ -1,6 +1,21 @@
 import inquirer from "inquirer";
 import Jimp from "jimp";
 
+// wait for 100 ms so that punycode depreciation warning for jimp is show abouve the inquirer prompt
+await new Promise((resolve) => setTimeout(resolve, 100)); // 100 ms delay
+
+const askToStart = async function () {
+  const answer = await inquirer.prompt([
+    {
+      type: "confirm",
+      name: "start",
+      message:
+        "\nWelcome to the image watermarking app!\nDo you want to start the app?",
+    },
+  ]);
+  if (!answer.start) process.exit();
+};
+
 async function askForInputs() {
   const answers = await inquirer.prompt([
     // ask for the path to the input image file
@@ -38,14 +53,52 @@ async function askForInputs() {
   return answers;
 }
 
-// then create new image file with watermark and save it
 const addTextWatermarkToImage = async function (inputFile, outputFile, text) {
   const image = await Jimp.read(inputFile);
-  const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
-  image.print(font, 10, 10, text);
+  const font = await Jimp.loadFont(Jimp.FONT_SANS_32_WHITE);
+  const textData = {
+    text,
+    alignmentX: Jimp.HORIZONTAL_ALIGN_CENTER,
+    alignmentY: Jimp.VERTICAL_ALIGN_MIDDLE,
+  };
+  image.print(font, 0, 0, textData, image.getWidth(), image.getHeight());
   await image.quality(100).writeAsync(outputFile);
 };
 
-const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
-  await askForInputs();
-addTextWatermarkToImage(imagePath, "./test-with-watermark.jpg", watermarkText);
+const addImageWatermarkToImage = async function (
+  inputFile,
+  outputFile,
+  watermarkFile
+) {
+  const image = await Jimp.read(inputFile);
+  const watermark = await Jimp.read(watermarkFile);
+  const x = image.getWidth() / 2 - watermark.getWidth() / 2;
+  const y = image.getHeight() / 2 - watermark.getHeight() / 2;
+  image.composite(watermark, x, y, {
+    mode: Jimp.BLEND_SOURCE_OVER,
+    opacitySource: 0.5,
+  });
+  await image.quality(100).writeAsync(outputFile);
+};
+
+const startApp = async function () {
+  await askToStart();
+  const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
+    await askForInputs();
+
+  if (watermarkType === "Text") {
+    addTextWatermarkToImage(
+      imagePath,
+      "./test-with-watermark.jpg",
+      watermarkText
+    );
+  } else if (watermarkType === "Image") {
+    addImageWatermarkToImage(
+      imagePath,
+      "./test-with-watermark.jpg",
+      watermarkImagePath
+    );
+  }
+};
+
+startApp();

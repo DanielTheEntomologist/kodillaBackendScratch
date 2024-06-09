@@ -15,5 +15,8 @@
     "watermark"
   ],
   "author": "DanielTheEnthomologist",
-  "license": "MIT"
+  "license": "MIT",
+  "dependencies": {
+    "inquirer": "^9.2.23"
+  }
 }

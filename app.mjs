@@ -1,4 +1,5 @@
 import inquirer from "inquirer";
+import Jimp from "jimp";
 
 async function askForInputs() {
   const answers = await inquirer.prompt([
@@ -36,10 +37,15 @@ async function askForInputs() {
 
   return answers;
 }
-const answers = await askForInputs();
-console.log(answers);
-
-const { imagePath, watermarkType, watermarkText, watermarkImagePath } = answers;
 
 // then create new image file with watermark and save it
-// using JIMP library
+const addTextWatermarkToImage = async function (inputFile, outputFile, text) {
+  const image = await Jimp.read(inputFile);
+  const font = await Jimp.loadFont(Jimp.FONT_SANS_32_BLACK);
+  image.print(font, 10, 10, text);
+  await image.quality(100).writeAsync(outputFile);
+};
+
+const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
+  await askForInputs();
+addTextWatermarkToImage(imagePath, "./test-with-watermark.jpg", watermarkText);

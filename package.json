@@ -17,6 +17,7 @@
   "author": "DanielTheEnthomologist",
   "license": "MIT",
   "dependencies": {
-    "inquirer": "^9.2.23"
+    "inquirer": "^9.2.23",
+    "jimp": "^0.22.12"
   }
 }

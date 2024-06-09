@@ -100,16 +100,20 @@ const addTextToFilename = function (filename, text) {
 };
 
 const startApp = async function () {
-  await askToStart();
-  const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
-    await askForInputs();
+  try {
+    await askToStart();
+    const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
+      await askForInputs();
 
-  const outputFilePath = addTextToFilename(imagePath, "with-watermark");
+    const outputFilePath = addTextToFilename(imagePath, "with-watermark");
 
-  if (watermarkType === "Text") {
-    addTextWatermarkToImage(imagePath, outputFilePath, watermarkText);
-  } else if (watermarkType === "Image") {
-    addImageWatermarkToImage(imagePath, outputFilePath, watermarkImagePath);
+    if (watermarkType === "Text") {
+      addTextWatermarkToImage(imagePath, outputFilePath, watermarkText);
+    } else if (watermarkType === "Image") {
+      addImageWatermarkToImage(imagePath, outputFilePath, watermarkImagePath);
+    }
+  } catch (error) {
+    console.log("Oppss! something went wrong");
   }
 };
 

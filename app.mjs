@@ -4,6 +4,8 @@ import Jimp from "jimp";
 // wait for 100 ms so that punycode depreciation warning for jimp is show abouve the inquirer prompt
 await new Promise((resolve) => setTimeout(resolve, 100)); // 100 ms delay
 
+const IMAGES_PATH = "./img/";
+
 const askToStart = async function () {
   const answer = await inquirer.prompt([
     {
@@ -22,7 +24,7 @@ async function askForInputs() {
     {
       type: "input",
       name: "imagePath",
-      default: "./example-image.jpg",
+      default: IMAGES_PATH + "example-image.jpg",
       message: "Enter the path to the image file:",
     },
     // then ask for a type of watermark (text or image)
@@ -44,7 +46,7 @@ async function askForInputs() {
     {
       type: "input",
       name: "watermarkImagePath",
-      default: "./example-watermark.png",
+      default: IMAGES_PATH + "example-watermark.png",
       message: "Enter the path to the watermark image:",
       when: (answers) => answers.watermarkType === "Image",
     },
@@ -81,23 +83,23 @@ const addImageWatermarkToImage = async function (
   await image.quality(100).writeAsync(outputFile);
 };
 
+const addTextToFilename = function (filename, text) {
+  const dir_root = filename.split(".").slice(0, -1).join(".");
+  const ext = filename.split(".").pop();
+  return `${dir_root}-${text}.${ext}`;
+};
+
 const startApp = async function () {
   await askToStart();
   const { imagePath, watermarkType, watermarkText, watermarkImagePath } =
     await askForInputs();
 
+  const outputFilePath = addTextToFilename(imagePath, "with-watermark");
+
   if (watermarkType === "Text") {
-    addTextWatermarkToImage(
-      imagePath,
-      "./test-with-watermark.jpg",
-      watermarkText
-    );
+    addTextWatermarkToImage(imagePath, outputFilePath, watermarkText);
   } else if (watermarkType === "Image") {
-    addImageWatermarkToImage(
-      imagePath,
-      "./test-with-watermark.jpg",
-      watermarkImagePath
-    );
+    addImageWatermarkToImage(imagePath, outputFilePath, watermarkImagePath);
   }
 };
 
